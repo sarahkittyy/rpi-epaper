@@ -1,6 +1,7 @@
 use std::{
+    env,
     error::Error,
-    ops::{Add, AddAssign, Sub},
+    ops::{AddAssign, Sub},
     thread::sleep,
     time::{Duration, Instant},
 };
@@ -192,6 +193,9 @@ fn floyd_steinberg_dither(img: &bmp::Image) -> PaperImage {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    let mut args = env::args().skip(1);
+    let clean = args.next();
+
     let spi = Spi::new(Bus::Spi0, SlaveSelect::Ss0, 5_000_000, Mode::Mode0)?;
     let dc = Gpio::new()?.get(DC)?.into_output();
     let busy = Gpio::new()?.get(BUSY)?.into_input();
@@ -210,7 +214,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     Init.send(&mut display)?;
     let now = Instant::now();
     println!("Printing image");
-    cmd::Draw(&floyd_steinberg_dither(&img)).send(&mut display)?;
+    if clean.is_some_and(|c| c == "clean") {
+        cmd::Draw(&draw::SolidColor(Color::Clean)).send(&mut display)?;
+    } else {
+        cmd::Draw(&floyd_steinberg_dither(&img)).send(&mut display)?;
+    }
     println!("Took {:?}", now.elapsed());
 
     Ok(())
