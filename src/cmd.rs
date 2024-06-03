@@ -58,7 +58,7 @@ impl Command for Init {
         PLLControl.send(to)?;
         TempSensor.send(to)?;
         VCOMDataInterval {
-            border_output: Color::Black,
+            border_output: Color::Clean,
         }
         .send(to)?;
         Unknown6022.send(to)?;
@@ -66,7 +66,7 @@ impl Command for Init {
         UnknownE3AA.send(to)?;
         sleep(Duration::from_millis(100));
         VCOMDataInterval {
-            border_output: Color::Black,
+            border_output: Color::Clean,
         }
         .send(to)?;
         Ok(())
